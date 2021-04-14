@@ -17,10 +17,13 @@
  * phrase from a file you've .gitignored so it doesn't accidentally become public.
  *
  */
+require("dotenv").config()
 const HDWalletProvider = require("@truffle/hdwallet-provider")
-const infuraKey = process.env.REACT_APP_API_KEY
+const infuraKey = process.env.API_KEY
 const fs = require("fs")
-const mnemonic = process.env.REACT_APP_MNEMONIC
+const mnemonic = process.env.MNEMONIC
+
+console.log(infuraKey, mnemonic)
 
 module.exports = {
   /**
@@ -63,7 +66,7 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: "^0.6.0",    // Fetch exact version from solc-bin (default: truffle's version)
+      version: "0.6.10",    // Fetch exact version from solc-bin (default: truffle's version)
       settings: {          // See the solidity docs for advice about optimization and evmVersion
         optimizer: {
           enabled: false,

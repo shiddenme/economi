@@ -1770,7 +1770,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
 
 // File: contracts/AnimeNFT.sol
 
-pragma solidity ^0.6.10;
+pragma solidity 0.6.10;
 
 contract Economi is ERC721 {
   // variables.
