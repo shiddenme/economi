@@ -1,12 +1,33 @@
+// package imports
 import React from "react"
+import styled from "styled-components"
 
+// components imports
 import useApplicationData from "./hooks/useApplicationData"
+import Navbar from "./components/Navbar"
+import AppContainer from "./components/AppContainer"
+
+// styles
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(45deg, #77aa77 30%, #88bb88 100%)
+`
 
 const Application = () => {
   const { state, dispatch } = useApplicationData()
 
+  if (!state)
+    return <div></div>
+
   return (
-    <div>Hello World</div>
+    <Container>
+      <Navbar account={state.account} web3={state.web3} setAccount={state.setAccount} />
+      <AppContainer />
+    </Container>
   )
 }
 

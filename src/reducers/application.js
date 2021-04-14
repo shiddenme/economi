@@ -6,7 +6,8 @@ const handlers = {
     return {
       ...prevState, 
       web3: action.data.web3, 
-      contract: action.data.contract 
+      contract: action.data.contract,
+      setAccount: action.data.setAccount
     }
   },
   [SET_ACCOUNT]: (prevState, action) => {

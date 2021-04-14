@@ -20,7 +20,7 @@ export default function useApplicationData () {
     return contract
   }
 
-  const connectWeb3 = async web3 => {
+  const setAccount = async web3 => {
     const ethereum = window.ethereum
 
     if (!ethereum) return null
@@ -46,12 +46,12 @@ export default function useApplicationData () {
   useEffect(() => {
     const web3 = new Web3(Web3.givenProvider)
     const contract = getContract(web3)
-
-    connectWeb3(web3)
+    const setAcc = setAccount
 
     dispatch({ type: "SET_APPLICATION_DATA", data: {
       web3: web3,
       contract: contract,
+      setAccount: setAcc 
     }})
   }, [dispatch])
   
