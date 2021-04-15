@@ -4,6 +4,7 @@ import styled from "styled-components"
 
 // component imports
 import IconBar from "./IconBar"
+import Game from "./Game"
 
 // styles
 const Container = styled.div`
@@ -22,7 +23,7 @@ const IconBarContainer = styled.div`
   align-items: center;
   width: 5%;
   height: 100%;
-  background: linear-gradient(45deg, #669966 30%, #44aa66 90%);
+  background: linear-gradient(45deg, #66996622 30%, #44aa66 90%);
 
   @media (max-width: 1250px) {
     padding-top: 10px;
@@ -34,6 +35,9 @@ const IconBarContainer = styled.div`
 `
 
 const Window = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   height: 100%;
   width: 95%;
 
@@ -55,6 +59,7 @@ const AppContainer = () => {
         <IconBar active={active} setActive={setActive} />
       </IconBarContainer>
       <Window>
+        { active === 0 && <Game /> }
       </Window>
     </Container>
   )

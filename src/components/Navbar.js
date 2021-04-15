@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     userSelect: 'none'
   },
   background: {
-    background: 'linear-gradient(45deg, #44aa66 30%, #669966 90%)'
+    background: 'linear-gradient(45deg, #44aa66 30%, #66996622 90%)'
   },
   menuButton: {
     marginRight: theme.spacing(2),

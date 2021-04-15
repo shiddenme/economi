@@ -34,7 +34,7 @@ const useStyles = makeStyles({
   icon: {
     width: '4rem',
     height: '5rem',
-    color: '#000',
+    color: '#fff',
     padding: '2%',
     '@media (max-width: 1250px)': {
       width: '3rem',
@@ -49,7 +49,7 @@ const useStyles = makeStyles({
     }
   },
   focused: {
-    color: '#fff'
+    color: '#4f49'
   }
 })
 
