@@ -14,7 +14,7 @@ const Container = styled.div`
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(45deg, #77aa77 30%, #88bb88 100%)
+  background: linear-gradient(45deg, #88aa77 30%, #000 100%);
 `
 
 const Application = () => {

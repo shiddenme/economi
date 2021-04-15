@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     userSelect: 'none'
   },
   background: {
-    background: 'linear-gradient(45deg, #33aa66 30%, #669966 90%)'
+    background: 'linear-gradient(45deg, #44aa66 30%, #669966 90%)'
   },
   menuButton: {
     marginRight: theme.spacing(2),
@@ -92,17 +92,21 @@ const Navbar = ({ account, setAccount, web3 }) => {
   return (
     <div className={classes.root}>
       <AppBar className={classes.background} position="static">
-        <React.Fragment>
-          <Drawer anchor="left" open={state} onClose={toggleDrawer(false)}>
-            {list()}
-          </Drawer>
-        </React.Fragment>
         <Toolbar>
-          <IconButton onClick={toggleDrawer(true)} edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-            <MenuIcon />
-          </IconButton>
+          { account && (
+            <>
+              <FiberManualRecordIcon style={{"color":"#0000"}} />
+              <Button disabled={true} style={{"color":"#0000"}}>{ formattedAddress }</Button>
+            </>
+          )}
+          { !account && (
+            <>
+              <FiberManualRecordIcon style={{"color":"#0000"}} />
+              <Button disabled={true} style={{"color":"#0000"}} onClick={() => setAccount(web3)} color="inherit">Connect Wallet</Button>
+            </>
+          )}
           <Typography variant="h3" className={classes.title}>
-            🅴🅲🅾🅽🅾🅼🅸
+            ECONOMI
           </Typography>
           { account && (
             <>

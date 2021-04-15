@@ -1,6 +1,9 @@
 // package imports
-import React from "react"
+import React, { useState, useEffect } from "react"
 import styled from "styled-components"
+
+// component imports
+import IconBar from "./IconBar"
 
 // styles
 const Container = styled.div`
@@ -15,10 +18,15 @@ const Container = styled.div`
 `
 
 const IconBarContainer = styled.div`
-  height: 100%;
+  display: flex;
+  align-items: center;
   width: 5%;
+  height: 100%;
+  background: linear-gradient(45deg, #669966 30%, #44aa66 90%);
 
   @media (max-width: 1250px) {
+    padding-top: 10px;
+    padding-bottom: 10px;
     flex-direction: column;
     height: 5%;
     width: 100%;
@@ -27,35 +35,27 @@ const IconBarContainer = styled.div`
 
 const Window = styled.div`
   height: 100%;
-  width: 70%;
+  width: 95%;
 
   @media (max-width: 1250px) {
     flex-direction: column;
-    height: 70%;
-    width: 100%;
-  }
-`
-
-const ChatContainer = styled.div`
-  height: 100%;
-  width: 25%;
-
-  @media (max-width: 1250px) {
-    flex-direction: column;
-    height: 25%;
+    height: 95%;
     width: 100%;
   }
 `
 
 const AppContainer = () => {
+  const [active, setActive] = useState(null)
+
+  useEffect(() => setActive(3), [])
+
   return (
     <Container>
       <IconBarContainer>
+        <IconBar active={active} setActive={setActive} />
       </IconBarContainer>
       <Window>
       </Window>
-      <ChatContainer>
-      </ChatContainer>
     </Container>
   )
 }
