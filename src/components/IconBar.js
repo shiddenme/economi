@@ -22,11 +22,18 @@ const Container = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100%;
-  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  height: 100vh;
+  width: 5%;
+  background: linear-gradient(45deg, #66996622 30%, #44aa66 90%);
  
   @media (max-width: 1250px) {
+    order: 2;
     flex-direction: row;
+    height: 5%;
+    width: 100vw;
   }
 `
 

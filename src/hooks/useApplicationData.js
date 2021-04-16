@@ -41,6 +41,8 @@ export default function useApplicationData () {
     })
     
     dispatch({ type: "SET_ACCOUNT", account })
+
+    return account
   }
 
   const setMintableNotes = async (web3, contract) => {
@@ -48,7 +50,13 @@ export default function useApplicationData () {
     const notes = []
 
     for (let i=0; i < noteValues.length; i++) {
-      const note = await contract.methods.basicNote(noteValues[i]).call()
+      let note
+      try {
+        note = await contract.methods.basicNote(noteValues[i]).call()
+      } catch (err) {
+        continue
+      }
+
       notes.push({
         price: Number(web3.utils.fromWei(note, 'ether')),
         value: noteValues[i]
@@ -74,20 +82,28 @@ export default function useApplicationData () {
     return notes
   }
 
-  useEffect(async () => {
-    const web3 = new Web3(Web3.givenProvider)
-    const contract = getContract(web3)
-    const mintableNotes = await setMintableNotes(web3, contract)
-    const noteSupply = await getNoteSupply(web3, contract)
-    const setAcc = setAccount
+  useEffect(() => {
+    let web3, contract, mintableNotes, noteSupply, account 
+    
+    const fetchData = async () => {
+      web3 = new Web3(Web3.givenProvider)
+      contract = getContract(web3)
+      account = await setAccount(web3)
+      if (account) {
+        mintableNotes = await setMintableNotes(web3, contract)
+        noteSupply = await getNoteSupply(web3, contract)
+      }
+    }
 
-    dispatch({ type: "SET_APPLICATION_DATA", data: {
-      web3: web3,
-      contract: contract,
-      setAccount: setAcc,
-      mintableNotes: mintableNotes,
-      noteSupply: noteSupply
-    }})
+    fetchData().then(() => {
+      dispatch({ type: "SET_APPLICATION_DATA", data: {
+        web3: web3,
+        contract: contract,
+        account: account,
+        mintableNotes: mintableNotes,
+        noteSupply: noteSupply
+      }})
+    })
   }, [dispatch])
   
 

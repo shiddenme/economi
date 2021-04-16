@@ -7,11 +7,8 @@ import NoteGreen from "./../assets/note_green.png"
 import NoteGold from "./../assets/note_gold.png"
 
 const Container = styled.div`
-  border: 0.25rem solid #4856;
-  border-radius: 1%;
   width: 90%;
   min-height: 90%;
-  background: #000c;
 `
 
 const Note = styled.img`

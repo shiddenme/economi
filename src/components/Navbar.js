@@ -42,6 +42,14 @@ const useStyles = makeStyles((theme) => ({
   fullList: {
     width: 'auto',
   },
+  icon: {
+    color: '#4f3',
+    fontSize: '0.65rem'
+  },
+  iconDisabled: {
+    color: '#0000',
+    fontSize: '0.65rem'
+  }
 }))
 
 const Navbar = ({ account, setAccount, web3 }) => {
@@ -95,14 +103,8 @@ const Navbar = ({ account, setAccount, web3 }) => {
         <Toolbar>
           { account && (
             <>
-              <FiberManualRecordIcon style={{"color":"#0000"}} />
+              <FiberManualRecordIcon className={classes.iconDisabled} />
               <Button disabled={true} style={{"color":"#0000"}}>{ formattedAddress }</Button>
-            </>
-          )}
-          { !account && (
-            <>
-              <FiberManualRecordIcon style={{"color":"#0000"}} />
-              <Button disabled={true} style={{"color":"#0000"}} onClick={() => setAccount(web3)} color="inherit">Connect Wallet</Button>
             </>
           )}
           <Typography variant="h3" className={classes.title}>
@@ -110,14 +112,8 @@ const Navbar = ({ account, setAccount, web3 }) => {
           </Typography>
           { account && (
             <>
-              <FiberManualRecordIcon style={{"color":"#0f0"}} />
+              <FiberManualRecordIcon className={classes.icon} />
               <Button color="inherit">{ formattedAddress }</Button>
-            </>
-          )}
-          { !account && (
-            <>
-              <FiberManualRecordIcon style={{"color":"#f00"}} />
-              <Button onClick={() => setAccount(web3)} color="inherit">Connect Wallet</Button>
             </>
           )}
         </Toolbar>
