@@ -1,6 +1,10 @@
 import React, { useState, useEffect, Fragment } from "react"
 
 import styled from "styled-components"
+import { Button, withStyles, createMuiTheme, ThemeProvider, makeStyles } from "@material-ui/core"
+import { green, purple, black } from "@material-ui/core/colors"
+
+import MoneyIcon from "@material-ui/icons/Money"
 
 import NoteWhite from "./../assets/note_white.png"
 import NoteRed from "./../assets/note_red.png"
@@ -33,6 +37,7 @@ const P = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
   width: 25%;
   margin: 2%;
   
@@ -49,11 +54,6 @@ const Num = styled.div`
   position: absolute;
   color: #fff;
   font-weight: bold;
-  font-size: 1.75rem;
-
-  @media (max-width: 1250px) {
-    font-size: 1.5rem;
-  }
 `
 
 const Supp = styled.div`
@@ -70,9 +70,15 @@ const Supp = styled.div`
 `
 
 const NoteData = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #0f03;
   position: absolute;
-  background: #4445;
   color: #000;
+  width: 100%;
+  height: 100%;
 `
 
 const Own = styled.div`
@@ -89,51 +95,97 @@ const Own = styled.div`
   }
 `
 
+const Mint = styled(Button)`
+  background: #000;
+  color: #fff;
+`
+
+const muiTheme = createMuiTheme({ palette: { primary: green, secondary: purple } })
+
+const ButtonColored = withStyles((theme) => ({
+  root: {
+    width: '50%',
+    color: theme.palette.getContrastText(purple[500]),
+    backgroundColor: green[400],
+    '&:hover': {
+      backgroundColor: green[500],
+    },
+  }
+}))(Button)
+
+const useStyles = makeStyles((theme) => ({
+  margin: {
+    margin: theme.spacing(1),
+  }
+}))
+
+
 const Marketplace = ({ state }) => {
-  const [hover, setHover] = useState(null)
+  const [hover, setHover] = useState({})
+  const [minting, setMinting] = useState({})
+
+  const classes = useStyles()
 
   useEffect(() => {
     const hover = {}
+    const minting = {}
 
     if (!state.mintableNotes)
       return
 
     for (let i=0; i < state.mintableNotes.length; i++) {
       hover[i] = false
+      minting[i] = false
     }
 
     setHover(hover)
   }, [])
 
-  if (!hover || !state)
-    return <div></div>
-
   const handleHover = (id, bool) => setHover(prev => ({...prev, [id]: bool}))
-  
+
+  const handleMint = async (id, value) => {
+    let price = await state.contract.methods.basicNote(value).call()
+
+    await state.contract.methods.mintNote(value).send({ from: state.account, value: price }, () => {
+      setMinting(prev => ({ ...prev, [id]: true }))
+    })
+      .on('receipt', () => setMinting(prev => ({ ...prev, [id]: false })))
+      .on('error', () => console.log("error"))
+  }
+
   return (
     <Container>
       <Title>Marketplace</Title>
       <A>
-        { state.mintableNotes.map((note, idx) => {
+        { state.mintableNotes && state.mintableNotes.map((note, idx) => {
           return (
-            <Fragment key={idx}>
-            { !hover[idx] && ( 
-              <P onMouseEnter={() => handleHover(idx, true)} onMouseLeave={() => handleHover(idx, false)}>
+            <P key={idx} onMouseEnter={() => handleHover(idx, true)} onMouseLeave={() => handleHover(idx, false)}>
+            { (!hover[idx] && !minting[idx]) && ( 
+              <>
                 <Note src={NoteRed} />
                 <Num>{ note.value }</Num>
-              </P>
+              </>
             )}
-            { hover[idx] && (
-              <P onMouseEnter={() => handleHover(idx, true)} onMouseLeave={() => handleHover(idx, false)}>
+            { (hover[idx] || minting[idx]) && (
+              <>
                 <Note src={NoteWhite} />
                 <NoteData>
-                  { state.noteSupply[note.value] }
+                  Note Value: { note.value } <br />
+                  Circulating Supply: { state.noteSupply[note.value] } <br />
+                  Minting Price: { state.mintableNotes[idx].price } ETH
+                  <ThemeProvider theme={muiTheme}>
+                    <ButtonColored onClick={() => handleMint(idx, note.value)}className={classes.margin} variant="contained" endIcon={<MoneyIcon />}>
+                    { !minting[idx] && <span>Mint</span> }
+                    { minting[idx] && <span>Minting...</span> }
+                    </ButtonColored>
+                  </ThemeProvider>
                 </NoteData>
-              </P>
+              </>
             )}
-            </Fragment>
+            </P>
           )
         })}
+        { !state.mintableNotes && <div>Loading Data...</div> }
       </A>
     </Container>
   )

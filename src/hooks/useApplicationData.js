@@ -45,14 +45,14 @@ export default function useApplicationData () {
     return account
   }
 
-  const setMintableNotes = async (web3, contract) => {
+  const setMintableNotes = async (web3, contract, account) => {
     const noteValues = [1000, 2000, 5000]
     const notes = []
 
     for (let i=0; i < noteValues.length; i++) {
       let note
       try {
-        note = await contract.methods.basicNote(noteValues[i]).call()
+        note = await contract.methods.basicNote(noteValues[i]).call({ from: account })
       } catch (err) {
         continue
       }
@@ -66,8 +66,8 @@ export default function useApplicationData () {
     return notes
   }
 
-  const getNoteSupply = async (web3, contract) => {
-    const totalSupply = await contract.methods.totalSupply().call()
+  const getNoteSupply = async (web3, contract, account) => {
+    const totalSupply = await contract.methods.totalSupply().call({ from: account })
     const notes = {}
 
     for (let i=1; i <= totalSupply; i++) {
@@ -90,8 +90,8 @@ export default function useApplicationData () {
       contract = getContract(web3)
       account = await setAccount(web3)
       if (account) {
-        mintableNotes = await setMintableNotes(web3, contract)
-        noteSupply = await getNoteSupply(web3, contract)
+        mintableNotes = await setMintableNotes(web3, contract, account)
+        noteSupply = await getNoteSupply(web3, contract, account)
       }
     }
 

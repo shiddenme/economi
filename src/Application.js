@@ -34,26 +34,13 @@ const Application = () => {
   const [active, setActive] = useState(0)
   const [width, setWidth] = useState(window.innerWidth)
 
-  const debounce = (fn, ms) => { 
-    let timer
-    return _ => {
-      clearTimeout(timer)
-      timer = setTimeout(_ => {
-        timer = null
-        fn.apply(this)
-      }, ms)
-    }
-  }
+  const handleResize = () => setWidth(window.innerWidth)
 
   useEffect(() => {
-    const debouncedHandleResize = debounce(function handleResize() {
-      setWidth(window.innerWidth)
-    }, 100)
-
-    window.addEventListener('resize', debouncedHandleResize)
+    window.addEventListener('resize', handleResize)
 
     return _ => {
-      window.removeEventListener('resize', debouncedHandleResize)
+      window.removeEventListener('resize', handleResize)
     }
 
   }, [])
