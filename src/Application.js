@@ -13,7 +13,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
   background: linear-gradient(270deg, #000, #88aa77 50%, #000 100%);
 `
 

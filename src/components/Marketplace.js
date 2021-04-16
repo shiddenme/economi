@@ -2,16 +2,20 @@ import React, { useState, useEffect, Fragment } from "react"
 
 import styled from "styled-components"
 
+import NoteWhite from "./../assets/note_white.png"
 import NoteRed from "./../assets/note_red.png"
 import NoteGreen from "./../assets/note_green.png"
 import NoteGold from "./../assets/note_gold.png"
 
 const Container = styled.div`
-  border: 0.25rem solid #4856;
-  border-radius: 1%;
   width: 90%;
   min-height: 90%;
-  background: #000c;
+  user-select: none;
+`
+
+const Title = styled.h1`
+  color: #fff;
+  text-align: center;
 `
 
 const Note = styled.img`
@@ -31,14 +35,13 @@ const P = styled.div`
   align-items: center;
   width: 25%;
   margin: 2%;
-  user-select: none;
   
   @media (max-width: 1250px) {
-    width: 35%;
+    width: 45%;
   }
 
   @media (max-width: 725px) {
-    width: 50%;
+    width: 55%;
   }
 `
 
@@ -64,6 +67,12 @@ const Supp = styled.div`
   @media (max-width: 1250px) {
     font-size: 0.85rem;
   }
+`
+
+const NoteData = styled.div`
+  position: absolute;
+  background: #4445;
+  color: #000;
 `
 
 const Own = styled.div`
@@ -96,27 +105,30 @@ const Marketplace = ({ state }) => {
     setHover(hover)
   }, [])
 
-  if (!hover)
+  if (!hover || !state)
     return <div></div>
 
-  const handleHover = id => setHover(prev => ({...prev, [id]: !hover[id]}))
+  const handleHover = (id, bool) => setHover(prev => ({...prev, [id]: bool}))
   
   return (
     <Container>
+      <Title>Marketplace</Title>
       <A>
         { state.mintableNotes.map((note, idx) => {
           return (
             <Fragment key={idx}>
             { !hover[idx] && ( 
-              <P onMouseEnter={() => handleHover(idx)} onMouseLeave={() => handleHover(idx)}>
+              <P onMouseEnter={() => handleHover(idx, true)} onMouseLeave={() => handleHover(idx, false)}>
                 <Note src={NoteRed} />
                 <Num>{ note.value }</Num>
               </P>
             )}
             { hover[idx] && (
-              <P onMouseEnter={() => handleHover(idx)} onMouseLeave={() => handleHover(idx)}>
-                <Note src={NoteRed} />
-                <Num>{ 1111 }</Num>
+              <P onMouseEnter={() => handleHover(idx, true)} onMouseLeave={() => handleHover(idx, false)}>
+                <Note src={NoteWhite} />
+                <NoteData>
+                  { state.noteSupply[note.value] }
+                </NoteData>
               </P>
             )}
             </Fragment>
