@@ -26,7 +26,7 @@ const Application = () => {
   return (
     <Container>
       <Navbar account={state.account} web3={state.web3} setAccount={state.setAccount} />
-      <AppContainer />
+      <AppContainer state={state} />
     </Container>
   )
 }

@@ -7,7 +7,9 @@ const handlers = {
       ...prevState, 
       web3: action.data.web3, 
       contract: action.data.contract,
-      setAccount: action.data.setAccount
+      setAccount: action.data.setAccount,
+      mintableNotes: action.data.mintableNotes,
+      noteSupply: action.data.noteSupply
     }
   },
   [SET_ACCOUNT]: (prevState, action) => {

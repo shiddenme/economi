@@ -5,6 +5,7 @@ import styled from "styled-components"
 // component imports
 import IconBar from "./IconBar"
 import Game from "./Game"
+import Marketplace from "./Marketplace"
 
 // styles
 const Container = styled.div`
@@ -48,7 +49,7 @@ const Window = styled.div`
   }
 `
 
-const AppContainer = () => {
+const AppContainer = ({ state }) => {
   const [active, setActive] = useState(null)
 
   useEffect(() => setActive(3), [])
@@ -60,6 +61,7 @@ const AppContainer = () => {
       </IconBarContainer>
       <Window>
         { active === 0 && <Game /> }
+        { active === 1 && <Marketplace state={state} /> }
       </Window>
     </Container>
   )
