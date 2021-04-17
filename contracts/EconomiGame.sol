@@ -299,6 +299,7 @@ contract EconomiGame {
 
   // variables.
   IERC721 public EconomiNFT;
+  address public owner;
   uint256 public startTime;
   bool public startGame = false;
   // teams
@@ -317,14 +318,30 @@ contract EconomiGame {
   // events.
 
   // constructor.
-  constructor (address _nft) public {
+  constructor (address _nft, uint256 _startTime) public {
+    owner = msg.sender;
     EconomiNFT = IERC721(_nft);
+    startTime = _startTime;
   }
 
   // --- GET FUNCTIONS ---
+  function getTime() public view returns(uint) {
+    return block.timestamp;
+  }
   // ---------------------
 
   // --- POST FUNCTIONS ---
+  // **** FOR TESTING ONLY ****
+  function updateStartTime(uint256 _timestamp) public {
+    startGame = false;
+    startTime = _timestamp;
+  }
+
+  function gameStart() public {
+    require(msg.sender == owner, "Only the owner can start the game.");
+    startGame = true;
+  }
+
   function joinGame(uint256 _noteId) public returns(string memory) {
     // ensure the game has not started.
     require(!startGame, "This game has already started.");
@@ -350,6 +367,10 @@ contract EconomiGame {
     uint256 noteValue = EconomiNFT.getNoteValue(_noteId);
     teams[teamToJoin][msg.sender] = noteValue;
     teamGDP[teamToJoin] = teamGDP[teamToJoin].add(noteValue);
+
+    // check if the game can be started.
+    if (getTime() > startTime)
+      startGame = true;
 
     return teamToJoin;
   }

@@ -12,7 +12,7 @@ contract("Economi", accounts => {
 
   beforeEach(async () => {
     economi = await Economi.deployed()
-    game = await EconomiGame.deployed(economi.address)
+    game = await EconomiGame.deployed()
   })
 
   it("Testing generate function", async () => {
@@ -68,6 +68,5 @@ contract("Economi", accounts => {
       Number(GDP[2]),
       Number(GDP[3])
     )
-    
   })
 })
