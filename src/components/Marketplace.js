@@ -7,8 +7,8 @@ import { green, purple, black } from "@material-ui/core/colors"
 import MoneyIcon from "@material-ui/icons/Money"
 
 import NoteWhite from "./../assets/note_white.png"
-import NoteRed from "./../assets/note_red.png"
-import NoteGreen from "./../assets/note_green.png"
+import NoteBronze from "./../assets/note_bronze.png"
+import NoteSilver from "./../assets/note_silver.png"
 import NoteGold from "./../assets/note_gold.png"
 
 const Container = styled.div`
@@ -168,7 +168,9 @@ const Marketplace = ({ state }) => {
             <P key={idx} onMouseEnter={() => handleHover(idx, true)} onMouseLeave={() => handleHover(idx, false)}>
             { (!hover[idx] && !minting[idx]) && ( 
               <>
-                <Note src={NoteRed} />
+                { note.value < 10000 && <Note src={NoteBronze} /> }
+                { note.value >= 10000 && note.value < 100000 && <Note src={NoteSilver} /> }
+                { note.value >= 100000 && note.value < 1000000 && <Note src={NoteGold} /> }
                 <Num>{ formatter.format(note.value) }</Num>
               </>
             )}

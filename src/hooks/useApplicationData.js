@@ -51,7 +51,7 @@ export default function useApplicationData () {
   }
 
   const setMintableNotes = async (web3, contract, account) => {
-    const noteValues = [1000, 2000, 5000]
+    const noteValues = [1000, 2000, 5000, 10000, 100000]
     const notes = []
 
     for (let i=0; i < noteValues.length; i++) {
@@ -107,11 +107,22 @@ export default function useApplicationData () {
     for (let i=1; i <= totalSupply; i++) {
       const x = await contract.methods.ownerOf(i).call()
       const n = await contract.methods.notes(i).call()
-      if (compareAddresses(account, x))
+      if (compareAddresses(account, x)) {
+        n['id'] = i
         notes.push(n)
+      }
     }
 
-    return notes
+
+    return notes.map(note => {
+      return {
+        owner: note[0],
+        value: note[1],
+        forSale: note[2],
+        price: note[3],
+        id: note.id
+      }
+    })
   }
 
   useEffect(() => {

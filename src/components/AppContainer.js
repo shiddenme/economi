@@ -5,6 +5,7 @@ import styled from "styled-components"
 // component imports
 import Game from "./Game"
 import Marketplace from "./Marketplace"
+import Wallet from "./Wallet"
 
 // styles
 const Container = styled.div`
@@ -39,6 +40,7 @@ const AppContainer = ({ state, active }) => {
       <Window>
         { active === 0 && <Game /> }
         { active === 1 && <Marketplace state={state} /> }
+        { active === 3 && <Wallet notes={state.userNotes} /> }
       </Window>
     </Container>
   )
