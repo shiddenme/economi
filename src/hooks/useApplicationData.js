@@ -20,7 +20,7 @@ export default function useApplicationData () {
     return contract
   }
 
-  const setAccount = async web3 => {
+  const setAccount = async (web3, contract) => {
     const ethereum = window.ethereum
 
     if (!ethereum) return null
@@ -31,17 +31,22 @@ export default function useApplicationData () {
 
     let account = currAccount[0]
 
-    ethereum.on("accountsChanged", (accounts) => {
+    ethereum.on("accountsChanged", async (accounts) => {
+      // quick solution
+      // window.location.reload()
       account = accounts[0]
-      dispatch({ type: "SET_ACCOUNT", account })
+      const userNotes = await getUserNotes(web3, contract, account)
+
+      dispatch({ type: "UPDATE_ACCOUNT", data: {
+        account: account,
+        userNotes: userNotes
+      }})
     })
 
     ethereum.on("chainChanged", (chainId) => {
       window.location.reload()
     })
     
-    dispatch({ type: "SET_ACCOUNT", account })
-
     return account
   }
 
@@ -82,16 +87,44 @@ export default function useApplicationData () {
     return notes
   }
 
+  const getUserNotes = async (web3, contract, account) => {
+    const totalSupply = await contract.methods.totalSupply().call({ from: account })
+    const notes = []
+   
+    const compareAddresses = (addr1, addr2) => {
+      for (let i=0; i < addr1.length; i++) {
+        const currA = addr1[i]
+        const currB = addr2[i]
+
+        if (isNaN(currA) && isNaN(currB) && currA.toUpperCase() !== currB.toUpperCase())
+          return false
+        if (!isNaN(currA) && currA !== currB)
+          return false
+      }
+      return true
+    }
+
+    for (let i=1; i <= totalSupply; i++) {
+      const x = await contract.methods.ownerOf(i).call()
+      const n = await contract.methods.notes(i).call()
+      if (compareAddresses(account, x))
+        notes.push(n)
+    }
+
+    return notes
+  }
+
   useEffect(() => {
-    let web3, contract, mintableNotes, noteSupply, account 
+    let web3, contract, mintableNotes, noteSupply, account, userNotes
     
     const fetchData = async () => {
       web3 = new Web3(Web3.givenProvider)
       contract = getContract(web3)
-      account = await setAccount(web3)
+      account = await setAccount(web3, contract)
       if (account) {
         mintableNotes = await setMintableNotes(web3, contract, account)
         noteSupply = await getNoteSupply(web3, contract, account)
+        userNotes = await getUserNotes(web3, contract, account)
       }
     }
 
@@ -101,10 +134,13 @@ export default function useApplicationData () {
         contract: contract,
         account: account,
         mintableNotes: mintableNotes,
-        noteSupply: noteSupply
+        noteSupply: noteSupply,
+        userNotes: userNotes
       }})
     })
-  }, [dispatch])
+
+    return () => null
+  }, [])
   
 
   return { state, dispatch } 

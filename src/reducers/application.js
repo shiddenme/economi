@@ -1,5 +1,5 @@
 const SET_APPLICATION_DATA = "SET_APPLICATION_DATA"
-const SET_ACCOUNT = "SET_ACCOUNT"
+const UPDATE_ACCOUNT = "UPDATE_ACCOUNT"
 
 const handlers = {
   [SET_APPLICATION_DATA]: (prevState, action) => {
@@ -9,13 +9,15 @@ const handlers = {
       contract: action.data.contract,
       account: action.data.account,
       mintableNotes: action.data.mintableNotes,
-      noteSupply: action.data.noteSupply
+      noteSupply: action.data.noteSupply,
+      userNotes: action.data.userNotes
     }
   },
-  [SET_ACCOUNT]: (prevState, action) => {
+  [UPDATE_ACCOUNT]: (prevState, action) => {
     return {
       ...prevState,
-      account: action.account
+      account: action.data.account,
+      userNotes: action.data.userNotes
     }
   }
 }

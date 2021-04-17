@@ -20,6 +20,7 @@ const Container = styled.div`
 const Title = styled.h1`
   color: #fff;
   text-align: center;
+  text-shadow: 1px 1px #000;
 `
 
 const Note = styled.img`
@@ -54,6 +55,7 @@ const Num = styled.div`
   position: absolute;
   color: #fff;
   font-weight: bold;
+  font-size: 2rem;
 `
 
 const Supp = styled.div`
@@ -139,6 +141,8 @@ const Marketplace = ({ state }) => {
     }
 
     setHover(hover)
+
+    return () => {}
   }, [])
 
   const handleHover = (id, bool) => setHover(prev => ({...prev, [id]: bool}))
@@ -153,6 +157,8 @@ const Marketplace = ({ state }) => {
       .on('error', () => console.log("error"))
   }
 
+  const formatter = new Intl.NumberFormat()
+
   return (
     <Container>
       <Title>Marketplace</Title>
@@ -163,14 +169,14 @@ const Marketplace = ({ state }) => {
             { (!hover[idx] && !minting[idx]) && ( 
               <>
                 <Note src={NoteRed} />
-                <Num>{ note.value }</Num>
+                <Num>{ formatter.format(note.value) }</Num>
               </>
             )}
             { (hover[idx] || minting[idx]) && (
               <>
                 <Note src={NoteWhite} />
                 <NoteData>
-                  Note Value: { note.value } <br />
+                  Note Value: { formatter.format(note.value) } <br />
                   Circulating Supply: { state.noteSupply[note.value] } <br />
                   Minting Price: { state.mintableNotes[idx].price } ETH
                   <ThemeProvider theme={muiTheme}>

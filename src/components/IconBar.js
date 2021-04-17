@@ -52,7 +52,7 @@ const useStyles = makeStyles({
       height: '3rem',
     },
     '&:hover': {
-      color: '#464'
+      color: '#000',
     }
   },
   focused: {
