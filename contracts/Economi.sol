@@ -1793,9 +1793,14 @@ contract Economi is ERC721 {
   }
 
   // --- GET FUNCTIONS ---
-  function getNoteInformation (uint256 _note) public view returns(address, bool, uint256, uint256) {
+  function getNoteInformation(uint256 _note) public view returns(address, bool, uint256, uint256) {
     Note storage note = notes[_note];
     return (note.owner, note.forSale, note.price, note.value);
+  }
+
+  function getNoteValue(uint256 _note) public view returns(uint256) {
+    Note storage note = notes[_note];
+    return note.value;
   }
 
   // ---------------------

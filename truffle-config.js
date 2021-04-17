@@ -23,8 +23,6 @@ const infuraKey = process.env.API_KEY
 const fs = require("fs")
 const mnemonic = process.env.MNEMONIC
 
-console.log(infuraKey, mnemonic)
-
 module.exports = {
   /**
    * Networks define how you connect to your ethereum client and let you set the

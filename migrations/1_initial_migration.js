@@ -1,5 +1,7 @@
 const Economi = artifacts.require("Economi");
+const EconomiGame = artifacts.require("EconomiGame")
 
-module.exports = function (deployer) {
-  deployer.deploy(Economi)
+module.exports = async (deployer) => {
+  await deployer.deploy(Economi)
+  await deployer.deploy(EconomiGame, Economi.address)
 }
