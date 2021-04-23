@@ -2,7 +2,7 @@ import React, { useState, useEffect, Fragment } from "react"
 
 import styled from "styled-components"
 import { Button, withStyles, createMuiTheme, ThemeProvider, makeStyles } from "@material-ui/core"
-import { green, purple, black } from "@material-ui/core/colors"
+import { green, purple } from "@material-ui/core/colors"
 
 import MoneyIcon from "@material-ui/icons/Money"
 
@@ -58,19 +58,6 @@ const Num = styled.div`
   font-size: 2rem;
 `
 
-const Supp = styled.div`
-  padding: 2%;
-  position: absolute;
-  color: #fff;
-  left: 0;
-  bottom: 0;
-  font-size: 1.20rem;
-
-  @media (max-width: 1250px) {
-    font-size: 0.85rem;
-  }
-`
-
 const NoteData = styled.div`
   display: flex;
   flex-direction: column;
@@ -82,26 +69,6 @@ const NoteData = styled.div`
   width: 100%;
   height: 100%;
 `
-
-const Own = styled.div`
-  padding: 2%;
-  position: absolute;
-  color: #fff;
-  right: 0;
-  bottom: 0;
-  font-size: 1.00rem;
-  font-style: italic;
-
-  @media (max-width: 1250px) {
-    font-size: 0.70rem;
-  }
-`
-
-const Mint = styled(Button)`
-  background: #000;
-  color: #fff;
-`
-
 const muiTheme = createMuiTheme({ palette: { primary: green, secondary: purple } })
 
 const ButtonColored = withStyles((theme) => ({

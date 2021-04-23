@@ -6,6 +6,12 @@ const web3 = new Web3()
 
 const toWei = amount => web3.utils.toWei(String(amount), 'ether')
 
+const timeout = (delay, value) => {
+   return new Promise(function(resolve) {
+       setTimeout(() => resolve(value), delay)
+   })
+}
+
 contract("Economi", accounts => {
   let economi 
   let game
@@ -14,6 +20,25 @@ contract("Economi", accounts => {
     economi = await Economi.deployed()
     game = await EconomiGame.deployed()
   })
+
+  it("Get random number", async () => {
+    let rand
+    for (let i=1; i < 10; i++) {
+      await game.getRandomEvent()
+      rand = await game.getRandomNumber()
+      console.log(Number(rand))
+    }
+  })
+
+  /*
+  it("Ensure endtime is 10 minutes from start time", async () => {
+    let start = await game.startTime()
+    let end = await game.endTime()
+    start = new Date(Number(start) * 1000)
+    end = new Date(Number(end) * 1000)
+    console.log(start, end)
+  })
+  */
 
   it("Testing generate function", async () => {
     await economi.generateBasicNote(1000, toWei(0.01), { from: accounts[0] })
@@ -45,6 +70,7 @@ contract("Economi", accounts => {
   it("Join game", async () => {
     const supply = await economi.totalSupply()
     for (let i=1; i <= supply; i++) {
+      //await timeout(5000)
       let owner = await economi.ownerOf(i)
       await economi.approve(game.address, i, { from: accounts[i] })
       assert.equal(owner, accounts[i])
@@ -56,10 +82,10 @@ contract("Economi", accounts => {
 
   it("log team data", async () => {
     const GDP = [
-      await game.teamGDP('t1'),
-      await game.teamGDP('t2'),
-      await game.teamGDP('t3'),
-      await game.teamGDP('t4')
+      await game.teamGDP('bankers'),
+      await game.teamGDP('programmers'),
+      await game.teamGDP('politicians'),
+      await game.teamGDP('traders')
     ]
 
     console.log(

@@ -301,12 +301,16 @@ contract EconomiGame {
   IERC721 public EconomiNFT;
   address public owner;
   uint256 public startTime;
+  uint256 public endTime;
+  uint256 public randomEventTimer;
+  uint256 public randomNumber;
+  uint256 public nonce = 0;
   bool public startGame = false;
+  bool public eventCalled = false;
+
+
   // teams
-  string t1 = 't1';
-  string t2 = 't2';
-  string t3 = 't3';
-  string t4 = 't4';
+  string[4] public teamNames = ["bankers", "programmers", "politicians", "traders"];
 
   // structs.
 
@@ -322,6 +326,7 @@ contract EconomiGame {
     owner = msg.sender;
     EconomiNFT = IERC721(_nft);
     startTime = _startTime;
+    endTime = _startTime.add(10 minutes);
   }
 
   // --- GET FUNCTIONS ---
@@ -335,11 +340,42 @@ contract EconomiGame {
   function updateStartTime(uint256 _timestamp) public {
     startGame = false;
     startTime = _timestamp;
+    endTime = startTime.add(10 minutes);
   }
+
+  // using Chainlink VRF for randomness in production.
+  function updateNonce() internal {
+    nonce++;
+  }
+
+  function getRandomNumber() public view returns(uint256) {
+    require(randomNumber >= 0, "Random number is not set.");
+    return randomNumber;
+  }
+
+  function updateRandomNumber(uint256 _modulus) internal {
+    updateNonce();
+    randomNumber = uint256(keccak256(abi.encodePacked(now,
+                                                      msg.sender,
+                                                      nonce))) % 
+                                                      _modulus;
+  }
+
+  // ***************************
 
   function gameStart() public {
     require(msg.sender == owner, "Only the owner can start the game.");
     startGame = true;
+    endTime = block.timestamp.add(10 minutes);
+  }
+
+  function getRandomEvent() public {
+    //require(block.timestamp > randomEventTimer, "Random event timer has not expired.");
+    /** generate random number from 0 - 4.
+      * results will affect the team based on their index in the teams array.
+      * 4 will affect all teams [global event].
+      */
+    updateRandomNumber(5);
   }
 
   function joinGame(uint256 _noteId) public returns(string memory) {
@@ -355,14 +391,14 @@ contract EconomiGame {
     players[msg.sender] = true;
     // determine which team has the lowest GDP.
     string memory teamToJoin;
-    if (teamGDP[t1] <= teamGDP[t2] && teamGDP[t1] <= teamGDP[t3] && teamGDP[t1] <= teamGDP[t4])
-      teamToJoin = t1;
-    else if (teamGDP[t2] <= teamGDP[t1] && teamGDP[t2] <= teamGDP[t3] && teamGDP[t2] <= teamGDP[t4])
-      teamToJoin = t2;
-    else if (teamGDP[t3] <= teamGDP[t1] && teamGDP[t3] <= teamGDP[t2] && teamGDP[t3] <= teamGDP[t4])
-      teamToJoin = t3;
+    if (teamGDP[teamNames[0]] <= teamGDP[teamNames[1]] && teamGDP[teamNames[0]] <= teamGDP[teamNames[2]] && teamGDP[teamNames[0]] <= teamGDP[teamNames[3]])
+      teamToJoin = teamNames[0];
+    else if (teamGDP[teamNames[1]] <= teamGDP[teamNames[0]] && teamGDP[teamNames[1]] <= teamGDP[teamNames[2]] && teamGDP[teamNames[1]] <= teamGDP[teamNames[3]])
+      teamToJoin = teamNames[1];
+    else if (teamGDP[teamNames[2]] <= teamGDP[teamNames[0]] && teamGDP[teamNames[2]] <= teamGDP[teamNames[1]] && teamGDP[teamNames[2]] <= teamGDP[teamNames[3]])
+      teamToJoin = teamNames[2];
     else
-      teamToJoin = t4;
+      teamToJoin = teamNames[3];
     // join team.
     uint256 noteValue = EconomiNFT.getNoteValue(_noteId);
     teams[teamToJoin][msg.sender] = noteValue;
