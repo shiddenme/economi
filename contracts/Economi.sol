@@ -1775,6 +1775,7 @@ pragma solidity 0.6.10;
 contract Economi is ERC721 {
   // variables.
   address public owner;
+  address public currentGameAddress;
 
   // structs.
   struct Note {
@@ -1806,8 +1807,13 @@ contract Economi is ERC721 {
   // ---------------------
 
   // --- POST FUNCTIONS ---
+  function setCurrentGameAddress(address _contract) public {
+    require(msg.sender == owner, "Only the owner can set the current game address.");
+    currentGameAddress = _contract;
+  }
+
   function generateNote(uint256 _value, address _owner) public {
-    require(msg.sender == owner, "Only the owner can generate notes.");
+    require(msg.sender == currentGameAddress, "Only the current game contract can generate notes.");
     uint256 supply = totalSupply().add(1);
     Note storage note = notes[supply];
     note.owner = _owner;
@@ -1831,6 +1837,11 @@ contract Economi is ERC721 {
     address payable _receiver = address(uint160(owner));
     _receiver.transfer(basicNote[_value]);
     _mint(msg.sender, supply);
+  }
+
+  function burnNote(uint256 _note) public {
+    require(msg.sender == currentGameAddress, "Only the current game contract can burn notes.");
+    _burn(_note);
   }
   // -----------------------
 

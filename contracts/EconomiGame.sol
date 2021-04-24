@@ -292,6 +292,8 @@ interface IERC721 is IERC165 {
     function safeTransferFrom(address from, address to, uint256 tokenId, bytes calldata data) external;
 
     function getNoteValue(uint256 _note) external view returns(uint256);
+    function burnNote(uint256 _note) external;
+    function generateNote(uint256 _value, address _owner) external;
 }
 
 contract EconomiGame {
@@ -305,19 +307,23 @@ contract EconomiGame {
   uint256 public randomEventTimer;
   uint256 public randomNumber;
   uint256 public nonce = 0;
+  string public winner;
   bool public startGame = false;
   bool public eventCalled = false;
 
-
-  // teams
+  // arrays 
   string[4] public teamNames = ["bankers", "programmers", "politicians", "traders"];
+  uint256[] public noteIds;
 
   // structs.
 
   // mappings.
   mapping (string => mapping(address => uint256)) public teams;
   mapping (string => uint256) public teamGDP;
+  mapping (string => uint256) public startTeamGDP;
   mapping (address => bool) public players;
+  mapping (uint256 => string) public teamViaId;
+  mapping (uint256 => address) public addressViaId;
 
   // events.
 
@@ -365,17 +371,73 @@ contract EconomiGame {
 
   function gameStart() public {
     require(msg.sender == owner, "Only the owner can start the game.");
+    startTeamGDP[teamNames[0]] = teamGDP[teamNames[0]];
+    startTeamGDP[teamNames[1]] = teamGDP[teamNames[1]];
+    startTeamGDP[teamNames[2]] = teamGDP[teamNames[2]];
+    startTeamGDP[teamNames[3]] = teamGDP[teamNames[3]];
     startGame = true;
-    endTime = block.timestamp.add(10 minutes);
+    endTime = block.timestamp.add(1 minutes);
+  }
+
+  function endGame() public {
+    require(msg.sender == owner, "Only the owner can end the game.");
+    require(block.timestamp >= endTime, "Game has not ended.");
+
+    // determine the winner.
+    if (teamGDP[teamNames[0]] > teamGDP[teamNames[1]] && 
+        teamGDP[teamNames[0]] > teamGDP[teamNames[2]] && 
+        teamGDP[teamNames[0]] > teamGDP[teamNames[3]])
+      winner = teamNames[0];
+    else if (teamGDP[teamNames[1]] > teamGDP[teamNames[0]] && 
+             teamGDP[teamNames[1]] > teamGDP[teamNames[2]] && 
+             teamGDP[teamNames[1]] > teamGDP[teamNames[3]])
+      winner = teamNames[1];
+    else if (teamGDP[teamNames[2]] > teamGDP[teamNames[0]] && 
+             teamGDP[teamNames[2]] > teamGDP[teamNames[1]] && 
+             teamGDP[teamNames[2]] > teamGDP[teamNames[3]])
+      winner = teamNames[2];
+    else
+      winner = teamNames[3];
+
+    // burn all notes and creaete new ones for the winners.
+    uint256 _id;
+
+    for (uint256 i=0; i < noteIds.length; i++) {
+      _id = noteIds[i];
+      EconomiNFT.burnNote(_id);
+    }
+
+    // mint new notes for the winners.
+    for (uint256 i=0; i < noteIds.length; i++) {
+      _id = noteIds[i];
+      if (keccak256(abi.encodePacked((teamViaId[_id]))) ==
+          keccak256(abi.encodePacked(winner)))
+        EconomiNFT.generateNote(teams[winner][addressViaId[_id]].mul(3), addressViaId[_id]);
+    }
   }
 
   function getRandomEvent() public {
+    require(startGame == true, "Game has not started.");
+    require(block.timestamp < endTime, "Game has ended.");
+    //require(block.timestamp < endTime, "Game has ended.");
     //require(block.timestamp > randomEventTimer, "Random event timer has not expired.");
+    //randomEventTimer = block.timestamp.add(15 seconds);
+
     /** generate random number from 0 - 4.
       * results will affect the team based on their index in the teams array.
       * 4 will affect all teams [global event].
       */
     updateRandomNumber(5);
+  
+    if (randomNumber < 4) {
+      uint256 GDP = teamGDP[teamNames[randomNumber]];
+      string memory team = teamNames[randomNumber];
+      updateRandomNumber(2);
+      if (randomNumber == 0)
+        teamGDP[team] = GDP.add(GDP.div(10));
+      else
+        teamGDP[team] = GDP.sub(GDP.div(10));
+    }
   }
 
   function joinGame(uint256 _noteId) public returns(string memory) {
@@ -386,7 +448,7 @@ contract EconomiGame {
     // ensure the sender owns the note.
     require(EconomiNFT.ownerOf(_noteId) == msg.sender, "You do not own the note.");
     // transfer the note to this address.
-    EconomiNFT.transferFrom(msg.sender, address(this), _noteId);
+    EconomiNFT.transferFrom(msg.sender, owner, _noteId);
     // add player to game.
     players[msg.sender] = true;
     // determine which team has the lowest GDP.
@@ -400,6 +462,9 @@ contract EconomiGame {
     else
       teamToJoin = teamNames[3];
     // join team.
+    noteIds.push(_noteId);
+    teamViaId[_noteId] = teamToJoin;
+    addressViaId[_noteId] = msg.sender;
     uint256 noteValue = EconomiNFT.getNoteValue(_noteId);
     teams[teamToJoin][msg.sender] = noteValue;
     teamGDP[teamToJoin] = teamGDP[teamToJoin].add(noteValue);

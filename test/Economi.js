@@ -21,14 +21,6 @@ contract("Economi", accounts => {
     game = await EconomiGame.deployed()
   })
 
-  it("Get random number", async () => {
-    let rand
-    for (let i=1; i < 10; i++) {
-      await game.getRandomEvent()
-      rand = await game.getRandomNumber()
-      console.log(Number(rand))
-    }
-  })
 
   /*
   it("Ensure endtime is 10 minutes from start time", async () => {
@@ -39,6 +31,12 @@ contract("Economi", accounts => {
     console.log(start, end)
   })
   */
+
+  it("Set the current game address", async () => {
+    await economi.setCurrentGameAddress(game.address, { from: accounts[0] })
+    const address = await economi.currentGameAddress()
+    assert.equal(address, game.address)
+  })
 
   it("Testing generate function", async () => {
     await economi.generateBasicNote(1000, toWei(0.01), { from: accounts[0] })
@@ -57,9 +55,9 @@ contract("Economi", accounts => {
     await economi.mintNote(10000, { from: accounts[4], value: toWei(0.1) })
     await economi.mintNote(20000, { from: accounts[5], value: toWei(0.2) })
     await economi.mintNote(50000, { from: accounts[6], value: toWei(0.5) })
-    await economi.mintNote(100000, { from: accounts[7], value: toWei(1) })
+    await economi.mintNote(50000, { from: accounts[7], value: toWei(0.5) })
     await economi.mintNote(50000, { from: accounts[8], value: toWei(0.5) })
-    await economi.mintNote(20000, { from: accounts[9], value: toWei(0.2) })
+    await economi.mintNote(100000, { from: accounts[9], value: toWei(1) })
   })
 
   it("Ensure total supply is accurate", async () => {
@@ -76,11 +74,11 @@ contract("Economi", accounts => {
       assert.equal(owner, accounts[i])
       await game.joinGame(i, { from: accounts[i] })
       owner = await economi.ownerOf(i)
-      assert.equal(owner, game.address)
+      assert.equal(owner, accounts[0])
     }
   })
 
-  it("log team data", async () => {
+  const getAllGDP = async () => {
     const GDP = [
       await game.teamGDP('bankers'),
       await game.teamGDP('programmers'),
@@ -94,5 +92,31 @@ contract("Economi", accounts => {
       Number(GDP[2]),
       Number(GDP[3])
     )
+  }
+
+  it("log team data.", async () => {
+    await game.gameStart({ from: accounts[0] })
+  })
+
+  it("Generate events.", async () => {
+    for (let i=1; i < 62; i++) {
+      try {
+        await game.getRandomEvent()
+        await getAllGDP()
+        await timeout(1000)
+      } catch(err) {
+        console.log("Game has ended.")
+      }
+    }
+  })
+
+  it("Determine the winner.", async () => {
+    let supply = await economi.totalSupply()
+    console.log(Number(supply))
+    await game.endGame({ from: accounts[0] })
+    const winner = await game.winner()
+    console.log(winner)
+    supply = await economi.totalSupply()
+    console.log(Number(supply))
   })
 })
